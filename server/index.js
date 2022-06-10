@@ -24,8 +24,4 @@ connectToDb((err) => {
     console.log('Can not connect to db');
   }
 });
-export let studentsList = [];
 
-export const pushListStudents = (list) => {
-  studentsList = [...list];
-};
