@@ -1,0 +1,70 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+button {
+  padding: 5px;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+td,
+th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+/* import */
+
+.import {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.import-header {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.import-content {
+  display: flex;
+  align-items: center;
+}
+
+.content-title {
+  padding: 10px;
+  border: 2px solid black;
+  margin-right: 10px;
+}
+
+/* search */
+.search {
+  padding: 10px;
+}
+
+.search-title {
+  margin-bottom: 20px;
+}
+
+.form-search > .search-item {
+  margin-bottom: 10px;
+}
+
+.form-search > .search-item > label {
+  display: inline-block;
+  width: 100px;
+}
+
+hr {
+  margin: 20px 0;
+}

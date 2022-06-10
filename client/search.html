@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./index.css" />
+
+    <title>Search Students</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="search">
+        <h1 class="search-title">Tra cứu thông tin tuyển sinh</h1>
+        <form class="form-search">
+          <div class="search-item">
+            <label for="name">Họ tên</label>
+            <input type="text" name="name" id="name" />
+          </div>
+
+          <div class="search-item">
+            <label for="msv">Mã sinh viên</label>
+            <input type="text" name="msv" id="msv" />
+          </div>
+
+          <button type="button" id="btn-search">Tìm kiếm</button>
+        </form>
+
+        <hr />
+
+        <div class="search-result">
+          <table></table>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // instance
+      const table = document.querySelector('table');
+      const msv = document.querySelector('#msv');
+      const name = document.querySelector('#name');
+      const btnSearch = document.querySelector('#btn-search');
+
+      const BASE_TEMPLATE = ` <tr>
+              <td colspan="7" id="sjs-A1">SỞ GDĐT HÀ NỘI</td>
+              <td colspan="15" id="sjs-H1">
+                DANH SÁCH HỌC SINH ĐĂNG KÝ DỰ TUYỂN VÒNG 2
+              </td>
+              <td id="sjs-W1"></td>
+            </tr>
+            <tr>
+              <td colspan="7" id="sjs-A2">TRƯỜNG THPT Nguyễn Trãi</td>
+              <td id="sjs-H2"></td>
+              <td id="sjs-I2"></td>
+              <td colspan="13" id="sjs-J2">NĂM HỌC 2022-2023</td>
+              <td id="sjs-W2"></td>
+            </tr>
+            <tr>
+              <td id="sjs-A3"></td>
+              <td id="sjs-B3"></td>
+              <td id="sjs-C3"></td>
+              <td id="sjs-D3"></td>
+              <td id="sjs-E3"></td>
+              <td id="sjs-F3"></td>
+              <td id="sjs-G3"></td>
+              <td id="sjs-H3"></td>
+              <td id="sjs-I3"></td>
+              <td id="sjs-J3"></td>
+              <td id="sjs-K3"></td>
+              <td id="sjs-L3"></td>
+              <td id="sjs-M3"></td>
+              <td id="sjs-N3"></td>
+              <td id="sjs-O3"></td>
+              <td id="sjs-P3"></td>
+              <td id="sjs-Q3"></td>
+              <td id="sjs-R3"></td>
+              <td id="sjs-S3"></td>
+              <td id="sjs-T3"></td>
+              <td id="sjs-U3"></td>
+              <td id="sjs-V3"></td>
+              <td id="sjs-W3"></td>
+            </tr>
+            <tr>
+              <td rowspan="2" id="sjs-A4">STT</td>
+              <td rowspan="2" id="sjs-B4">Trường Tiểu học</td>
+              <td rowspan="2" id="sjs-C4">Quận/Huyện</td>
+              <td rowspan="2" id="sjs-D4">Mã học sinh</td>
+              <td rowspan="2" id="sjs-E4">Lớp</td>
+              <td rowspan="2" id="sjs-F4">Họ và tên</td>
+              <td colspan="3" id="sjs-G4">Ngày sinh</td>
+              <td rowspan="2" id="sjs-J4">Giới</td>
+              <td rowspan="2" id="sjs-K4">Nơi sinh</td>
+              <td rowspan="2" id="sjs-L4">Dân tộc</td>
+              <td rowspan="2" id="sjs-M4">Hộ khẩu thường trú</td>
+              <td rowspan="2" id="sjs-N4">Điện thoại liên hệ</td>
+              <td colspan="8" id="sjs-O4">Điểm sơ tuyển vòng 1</td>
+              <td data-t="s" data-v="Ghi chú" id="sjs-W4">Ghi chú</td>
+            </tr>
+            <tr>
+              <td id="sjs-G5">Ngày</td>
+              <td id="sjs-H5">Tháng</td>
+              <td id="sjs-I5">Năm</td>
+              <td id="sjs-O5">Tổng điểm năm lớp 1</td>
+              <td id="sjs-P5">Tổng điểm năm lớp 2</td>
+              <td id="sjs-Q5">Tổng điểm năm lớp 3</td>
+              <td id="sjs-R5">Tổng điểm năm lớp 4</td>
+              <td id="sjs-S5">Tổng điểm năm lớp 5</td>
+              <td id="sjs-T5">Tổng điểm kết quả 5 năm</td>
+              <td id="sjs-U5">Điểm ưu tiên</td>
+              <td id="sjs-V5">Tổng điểm sơ tuyển</td>
+              <td id="sjs-W5"></td>
+            </tr>`;
+      // methods
+      const getAllStudents = async (e) => {
+        try {
+          const res = await fetch('http://localhost:3333/students');
+          if (!res.ok) return alert('Can not get students !');
+
+          const data = await res.json();
+
+          let html = data.students.map((student, index) => {
+            const {
+              school,
+              district,
+              msv,
+              _class,
+              name,
+              birth,
+              sex,
+              address,
+              ethnic,
+              hktt,
+              phone,
+              point,
+              note,
+            } = student;
+            return `<tr>
+                        <td id="sjs-A6">${index + 1}</td>
+                        <td id="sjs-B6">${school}</td>
+                        <td id="sjs-C6">${district}</td>
+                        <td id="sjs-D6">${msv}</td>
+                        <td id="sjs-E6">${_class}</td>
+                        <td id="sjs-F6">${name}</td>
+                        <td id="sjs-G6">${birth.ngay}</td>
+                        <td id="sjs-H6">${birth.thang}</td>
+                        <td id="sjs-I6">${birth.nam}</td>
+                        <td id="sjs-J6">${sex}</td>
+                        <td id="sjs-K6">${address}</td>
+                        <td id="sjs-L6">${ethnic}</td>
+                        <td id="sjs-M6">${hktt}</td>
+                        <td id="sjs-N6">${phone}</td>
+                        <td id="sjs-O6">${point.point1}</td>
+                        <td id="sjs-P6">${point.point2}</td>
+                        <td id="sjs-Q6">${point.point3}</td>
+                        <td id="sjs-R6">${point.point4}</td>
+                        <td id="sjs-S6">${point.point5}</td>
+                        <td id="sjs-T6">${point.point_total}</td>
+                        <td id="sjs-U6">${point.point_addition}</td>
+                        <td id="sjs-V6">${point.point_final}</td>
+                        <td id="sjs-W6">${note}</td>
+                    </tr>
+
+                  `;
+          });
+
+          html = html.join('');
+          html = BASE_TEMPLATE + html;
+
+          table.innerHTML = html;
+        } catch (e) {
+          alert(e.message);
+        }
+      };
+
+      const searchStudents = async (e) => {
+        try {
+          let BASE_URL = 'http://localhost:3333/students/search';
+
+          let url = BASE_URL;
+
+          if (msv.value) url += `?msv=${msv.value}`;
+          if (name.value) {
+            if (url === BASE_URL) url += `?name=${name.value}`;
+            else url += `&name=${name.value}`;
+          }
+          const res = await fetch(url);
+          if (!res.ok) return alert('Can not search students !');
+
+          const data = await res.json();
+
+          let html = data.students.map((student, index) => {
+            const {
+              school,
+              district,
+              msv,
+              _class,
+              name,
+              birth,
+              sex,
+              address,
+              ethnic,
+              hktt,
+              phone,
+              point,
+              note,
+            } = student;
+            return `<tr>
+                        <td id="sjs-A6">${index + 1}</td>
+                        <td id="sjs-B6">${school}</td>
+                        <td id="sjs-C6">${district}</td>
+                        <td id="sjs-D6">${msv}</td>
+                        <td id="sjs-E6">${_class}</td>
+                        <td id="sjs-F6">${name}</td>
+                        <td id="sjs-G6">${birth.ngay}</td>
+                        <td id="sjs-H6">${birth.thang}</td>
+                        <td id="sjs-I6">${birth.nam}</td>
+                        <td id="sjs-J6">${sex}</td>
+                        <td id="sjs-K6">${address}</td>
+                        <td id="sjs-L6">${ethnic}</td>
+                        <td id="sjs-M6">${hktt}</td>
+                        <td id="sjs-N6">${phone}</td>
+                        <td id="sjs-O6">${point.point1}</td>
+                        <td id="sjs-P6">${point.point2}</td>
+                        <td id="sjs-Q6">${point.point3}</td>
+                        <td id="sjs-R6">${point.point4}</td>
+                        <td id="sjs-S6">${point.point5}</td>
+                        <td id="sjs-T6">${point.point_total}</td>
+                        <td id="sjs-U6">${point.point_addition}</td>
+                        <td id="sjs-V6">${point.point_final}</td>
+                        <td id="sjs-W6">${note}</td>
+                    </tr>
+                  `;
+          });
+
+          html = html.join('');
+          html = BASE_TEMPLATE + html;
+
+          table.innerHTML = html;
+        } catch (e) {
+          alert(e.message);
+        }
+      };
+      // events
+
+      document.body.onload = getAllStudents;
+      btnSearch.onclick = searchStudents;
+    </script>
+  </body>
+</html>

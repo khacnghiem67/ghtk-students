@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./index.css" />
+    <title>Import Students</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="import">
+        <div class="import-header">
+          <h1>Tra cứu thông tin tuyển sinh</h1>
+          <img src="./logo-social.png" alt="logo" width="200" height="200" />
+        </div>
+        <div class="import-content">
+          <div class="content-title">Import file (.xlsx)</div>
+          <form>
+            <input hidden type="file" value="Import" accept=".xlsx" id="file" />
+          </form>
+          <button type="button" class="btn-import">Import</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const file = document.getElementById('file');
+      const btnImport = document.querySelector('.btn-import');
+
+      // methods
+      const handleClickButton = () => {
+        file.click();
+      };
+
+      const handleFileChange = async (e) => {
+        try {
+          const { files } = e.target;
+          // import
+          const formData = new FormData();
+          formData.append('file', files[0]);
+          const res = await fetch('http://localhost:3333/students/import', {
+            method: 'POST',
+            body: formData,
+          });
+          if (!res.ok) return alert('Something go wrong');
+          return alert('Import success !');
+        } catch (e) {
+          alert(e.message);
+        }
+      };
+
+      // events
+      btnImport.addEventListener('click', handleClickButton);
+
+      file.addEventListener('change', handleFileChange);
+    </script>
+  </body>
+</html>
